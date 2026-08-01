@@ -592,17 +592,73 @@ select.input { appearance: none; cursor: pointer; }
   background-repeat: no-repeat;
 }
 .dispatch-map__marker {
-  width: 14px; height: 14px;
+  width: 15px; height: 15px;
   border-radius: 999px;
   background: var(--danger);
   border: 2px solid rgba(255,255,255,0.9);
   position: absolute;
   transform: translate(-50%, -50%);
   box-shadow: 0 0 14px rgba(255,93,115,0.55);
-  animation: ping 1.8s ease-out infinite;
 }
-@keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(255,93,115,0.5);} 70%{ box-shadow: 0 0 0 10px rgba(255,93,115,0);} 100%{box-shadow:0 0 0 0 rgba(255,93,115,0);} }
+/* sanfter, ruhiger Puls-Ring für offene Calls */
+.dispatch-map__marker--open::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,93,115,0.7);
+  animation: markerPulse 2.4s ease-out infinite;
+}
+.dispatch-map__marker--done { background: var(--muted); box-shadow: 0 0 8px rgba(0,0,0,0.4); opacity: 0.75; }
+
+@keyframes markerPulse {
+  0%   { transform: scale(0.7); opacity: 0.9; }
+  70%  { transform: scale(2.1); opacity: 0; }
+  100% { transform: scale(2.1); opacity: 0; }
+}
+
+/* NEUER Notruf: kräftig aufploppen + auffälliger Doppel-Ring */
+.dispatch-map__marker--new {
+  z-index: 6;
+  animation: markerPop 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dispatch-map__marker--new::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,93,115,0.85);
+  animation: markerPulse 1.3s ease-out infinite;
+}
+@keyframes markerPop {
+  0%   { transform: translate(-50%, -50%) scale(0); }
+  60%  { transform: translate(-50%, -50%) scale(1.6); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.dispatch-map__label {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  background: rgba(255,93,115,0.92);
+  padding: 3px 8px;
+  border-radius: 8px;
+  box-shadow: 0 6px 18px -4px rgba(255,93,115,0.6);
+  animation: labelIn 0.5s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: none;
+}
+@keyframes labelIn { from { opacity: 0; transform: translateX(-50%) translateY(6px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
 .dispatch-map__marker[data-selected="1"] { background: var(--accent); box-shadow: 0 0 16px var(--accent-glow); }
+.dispatch-map__marker[data-selected="1"]::after { border-color: rgba(47,212,238,0.7); }
 .dispatch-map__marker-btn { cursor: pointer; padding: 0; outline: none; }
 
 /* helper */

@@ -177,4 +177,43 @@
       viewport: { left: 0, top: 0, right: 1, bottom: 1 },
     },
   };
+
+  // --- Preview-Demo: neue Notrufe live simulieren (nur im Browser) ---
+  var SIM_TEMPLATES = [
+    { message: 'Einbruch gemeldet – Vespucci Beach', sender: 'Anwohner' },
+    { message: 'Verkehrsunfall – Route 68', sender: 'Zeuge' },
+    { message: 'Schlägerei vor Bar – Vinewood', sender: 'Passant' },
+    { message: 'Verdächtige Person – Legion Square', sender: 'Anonym' },
+    { message: 'Ladendiebstahl – 24/7 Store', sender: 'Angestellter' },
+  ];
+  var simId = 4000;
+  function randCoord() {
+    return {
+      x: Math.round(-3500 + Math.random() * 7000),
+      y: Math.round(-3500 + Math.random() * 11000),
+    };
+  }
+  window.__MDT_SIMULATE_NEW_CALL__ = function () {
+    simId += 1;
+    var t = SIM_TEMPLATES[Math.floor(Math.random() * SIM_TEMPLATES.length)];
+    var c = randCoord();
+    var call = {
+      id: simId,
+      message: t.message,
+      sender: t.sender,
+      status: 'offen',
+      taken_by_name: null,
+      created_at: new Date().toISOString(),
+      x: c.x,
+      y: c.y,
+    };
+    db.calls = [call, ...db.calls];
+    window.dispatchEvent(new MessageEvent('message', {
+      data: { action: 'dispatchSync', payload: { type: 'new', call: call } },
+    }));
+  };
+  window.__MDT_START_SIM__ = function () {
+    setTimeout(window.__MDT_SIMULATE_NEW_CALL__, 2500);
+    setInterval(window.__MDT_SIMULATE_NEW_CALL__, 8000);
+  };
 })();

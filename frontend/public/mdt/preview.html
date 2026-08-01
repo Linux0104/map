@@ -255,6 +255,10 @@
                 if (t && typeof window.setTab === 'function') {
                     try { window.setTab(t); } catch (e) {}
                 }
+                // Demo: auf dem Dispatch-Tab neue Notrufe live einspielen
+                if (t === 'dispatch' && typeof window.__MDT_START_SIM__ === 'function') {
+                    window.__MDT_START_SIM__();
+                }
                 var person = p.get('person');
                 if (person && typeof window.loadPerson === 'function') {
                     setTimeout(function () { try { window.loadPerson(person); } catch (e) {} }, 200);

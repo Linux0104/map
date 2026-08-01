@@ -151,6 +151,21 @@ function setHeaderBadges() {
     if (bu) bu.textContent = my ? (my.callsign || `#${my.id}`) : 'Keine';
 }
 
+function markCallAsNew(id) {
+    const nid = Number(id);
+    if (!Number.isFinite(nid) || nid <= 0) return;
+    if (!state.newCallIds) state.newCallIds = new Set();
+    if (!state.newCallTimers) state.newCallTimers = {};
+    state.newCallIds.add(nid);
+    if (state.newCallTimers[nid]) clearTimeout(state.newCallTimers[nid]);
+    // Highlight nach 7s sanft entfernen -> Marker pulsiert danach nur noch ruhig weiter
+    state.newCallTimers[nid] = setTimeout(() => {
+        if (state.newCallIds) state.newCallIds.delete(nid);
+        delete state.newCallTimers[nid];
+        renderDispatch();
+    }, 7000);
+}
+
 function renderDashboard() {
     const el = qs('#dashboardRoot');
     if (!el) return;
@@ -859,13 +874,23 @@ function renderDispatch() {
         if (!callsWithCoords.length) {
             mapEl.innerHTML = `<div class="muted" style="padding:12px;">Keine Calls mit Koordinaten.</div>`;
         } else {
+            if (!state.newCallIds) state.newCallIds = new Set();
             mapEl.innerHTML = callsWithCoords
                 .map((c) => {
                     const x = Number(c.x);
                     const y = Number(c.y);
                     const p = worldToMapPercent(x, y, cfg);
                     const selectedAttr = Number(c.id) === Number(state.selectedDispatchId) ? '1' : '0';
-                    return `<button class="dispatch-map__marker dispatch-map__marker-btn" data-dmid="1" data-id="${escapeHtml(c.id)}" data-selected="${selectedAttr}" style="left:${p.px}%; top:${p.py}%;"></button>`;
+                    const isNew = state.newCallIds.has(Number(c.id));
+                    const isOpen = (c.status || 'offen') !== 'geschlossen';
+                    const cls = [
+                        'dispatch-map__marker',
+                        'dispatch-map__marker-btn',
+                        isOpen ? 'dispatch-map__marker--open' : 'dispatch-map__marker--done',
+                        isNew ? 'dispatch-map__marker--new' : '',
+                    ].filter(Boolean).join(' ');
+                    const label = isNew ? `<span class="dispatch-map__label">Neuer Notruf</span>` : '';
+                    return `<button class="${cls}" data-dmid="1" data-id="${escapeHtml(c.id)}" data-selected="${selectedAttr}" style="left:${p.px}%; top:${p.py}%;">${label}</button>`;
                 })
                 .join('');
 
@@ -2365,6 +2390,9 @@ window.addEventListener('message', async (event) => {
         const payload = data.payload || {};
         if (payload.type === 'new' && payload.call) {
             state.calls = [payload.call, ...state.calls];
+            markCallAsNew(payload.call.id);
+            // Neuen Call automatisch auswählen, damit er auffällt
+            if (payload.call.id) state.selectedDispatchId = payload.call.id;
             renderDispatch();
         }
         if (payload.type === 'update' && payload.call) {
