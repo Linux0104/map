@@ -576,27 +576,92 @@ select.input { appearance: none; cursor: pointer; }
 .detail-head__body { flex: 1; min-width: 0; }
 .detail-head__name { font-family: var(--display); font-size: 24px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
 
-/* =========================  DISPATCH MAP  ========================= */
-.dispatch-map-wrap { padding: 16px; display: flex; align-items: center; justify-content: center; }
-.dispatch-map--rotated { width: 640px; height: 460px; transform: rotate(90deg); transform-origin: center; }
+/* =========================  DISPATCH  ========================= */
+.dispatch-layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  min-height: 0;
+}
+.dispatch-col-left {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-height: 640px;
+  border-right: 1px solid var(--border-soft);
+}
+.dispatch-units {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-soft);
+  overflow: visible;
+}
+.dispatch-col-left .list {
+  flex: 1;
+  overflow: auto;
+  border-right: none;
+  max-height: none;
+}
+.dispatch-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  min-width: 0;
+}
+.dispatch-map-wrap { display: block; }
 .dispatch-map {
   width: 100%;
-  height: 460px;
+  aspect-ratio: 16 / 9;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--border);
   position: relative;
-  background-color: rgba(0, 0, 0, 0.35);
-  background-size: 100% 100%;
-  background-position: 0 0;
+  background-color: #060a10;
+  background-size: cover;
+  background-position: center;
   background-repeat: no-repeat;
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.55);
 }
+/* dezentes Cyber-Grid-Overlay über der Karte */
+.dispatch-map::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(47,212,238,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47,212,238,0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 1;
+}
+.dispatch-info {
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.005));
+  overflow: auto;
+}
+
+/* Zeilen in der linken Dispatch-Spalte vertikal stapeln + Buttons umbrechen lassen */
+.dispatch-col-left .row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+.dispatch-col-left .row > div { flex-wrap: wrap; min-width: 0; }
+.dispatch-col-left .btn,
+.dispatch-info .btn { padding: 7px 11px; font-size: 11px; }
+/* alle Button-Reihen im Dispatch dürfen umbrechen */
+.dispatch-col-left .row > div[style*="flex"],
+.dispatch-info div[style*="flex"] { flex-wrap: wrap !important; }
+.dispatch-units .field__row { flex-wrap: wrap; }
+
 .dispatch-map__marker {
   width: 15px; height: 15px;
   border-radius: 999px;
   background: var(--danger);
   border: 2px solid rgba(255,255,255,0.9);
   position: absolute;
+  z-index: 3;
   transform: translate(-50%, -50%);
   box-shadow: 0 0 14px rgba(255,93,115,0.55);
 }
@@ -654,6 +719,7 @@ select.input { appearance: none; cursor: pointer; }
   box-shadow: 0 6px 18px -4px rgba(255,93,115,0.6);
   animation: labelIn 0.5s cubic-bezier(0.16,1,0.3,1);
   pointer-events: none;
+  z-index: 7;
 }
 @keyframes labelIn { from { opacity: 0; transform: translateX(-50%) translateY(6px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 

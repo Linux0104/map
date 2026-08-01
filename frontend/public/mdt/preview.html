@@ -215,13 +215,17 @@
                                     <button id="dispatchCalBtn" class="btn">Kalibrieren</button>
                                 </div>
                             </div>
-                            <div class="grid grid--single">
-                                <div id="unitPanel" class="details" style="border-bottom: 1px solid rgba(255,255,255,0.06);"></div>
-                                <div id="dispatchMapWrap" class="dispatch-map-wrap">
-                                    <div id="dispatchMap" class="dispatch-map dispatch-map--rotated"></div>
+                            <div class="dispatch-layout">
+                                <div class="dispatch-col-left">
+                                    <div id="unitPanel" class="dispatch-units"></div>
+                                    <div class="list" id="dispatchResults"></div>
                                 </div>
-                                <div id="dispatchInfo" class="details" style="border-bottom: 1px solid rgba(255,255,255,0.06);"></div>
-                                <div class="list" id="dispatchResults"></div>
+                                <div class="dispatch-col-right">
+                                    <div id="dispatchMapWrap" class="dispatch-map-wrap">
+                                        <div id="dispatchMap" class="dispatch-map"></div>
+                                    </div>
+                                    <div id="dispatchInfo" class="dispatch-info"></div>
+                                </div>
                             </div>
                         </div>
                     </section>
